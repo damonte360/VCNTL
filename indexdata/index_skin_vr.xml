@@ -175,6 +175,14 @@
   <action name="showTourControls">set(tour_displaycontrols, true); events.dispatch(showtourcontrols);</action>
 
 
+  <action name="enableGyroscope">
+    changeGyroscopeState(true);
+  </action>
+  <action name="disableGyroscope">
+    changeGyroscopeState(false);
+  </action>
+
+
 <action name="setViewNormal">
 	stopSetViewTweens();
 	if(current_view_isflat === true,
@@ -482,7 +490,6 @@
     );
   </action>
   <action name="preloadSounds">
-    preloadsound("cheerful-piano-for-bright-days-145697.mp3");
   </action>
 
   <action name="play3DLocalSounds">

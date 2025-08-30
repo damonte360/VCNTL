@@ -95,6 +95,9 @@
   <data name="ru_controlBar_classicsoundsOffTip"><![CDATA[Stop sounds]]></data>
   <data name="ru_controlBar_classicshowThumbnailsTip"><![CDATA[Show thumbnails]]></data>
   <data name="ru_controlBar_classichideThumbnailsTip"><![CDATA[Hide thumbnails]]></data>
+  <data name="ru_controlBar_classicgyroOnTip"><![CDATA[Enable gyroscope]]></data>
+  <data name="ru_controlBar_classicgyroOffTip"><![CDATA[Disable gyroscope]]></data>
+  <data name="ru_controlBar_classicgyroNotTip"><![CDATA[Gyroscope is unavailable]]></data>
   <data name="ru_controlBar_classicdisplayHelpTip"><![CDATA[Show help screen]]></data>
   <data name="ru_controlBar_classichideHelpTip"><![CDATA[Hide help screen]]></data>
   <data name="ru_controlBar_classicenterVRTip"><![CDATA[VR mode]]></data>

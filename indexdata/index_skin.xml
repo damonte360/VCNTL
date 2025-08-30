@@ -274,6 +274,18 @@
     );
 
 
+    if(plugin[gyroscope],
+      set(controlBar_classicDisplayGyroscopeButton, false);
+      if (device.tablet, set(controlBar_classicDisplayGyroscopeButton, true););
+      if (device.mobile, set(controlBar_classicDisplayGyroscopeButton, true););
+      if(controlBar_classicDisplayGyroscopeButton,
+        set(layer[controlBar_classicbtn_gyroscope_on ].x, get(controlBar_classicbutton_pos));
+        set(layer[controlBar_classicbtn_gyroscope_off].x, get(controlBar_classicbutton_pos));
+        set(layer[controlBar_classicbtn_gyroscope_not].x, get(controlBar_classicbutton_pos));
+        inc(controlBar_classicbutton_pos, 36);
+      );
+    );
+
 
     if (device.desktop,
         set(layer[controlBar_classicbtn_right].x, get(controlBar_classicbutton_pos));
@@ -367,6 +379,34 @@
          alpha="1.0"
          >
 
+
+    <layer name="controlBar_classicbtn_gyroscope_off"
+            url="%FIRSTXML%/graphics/classiccontrolbar/btn_gyroscope.png"
+            style="controlBar_classic_btn_style"
+            onclick="disableGyroscope();
+"
+            devices="html5"
+            tooltip="controlBar_classicgyroOffTip"
+            visible="false"
+            />
+    <layer name="controlBar_classicbtn_gyroscope_on"
+            url="%FIRSTXML%/graphics/classiccontrolbar/btn_gyroscope.png"
+            style="controlBar_classic_btn_style"
+            onclick="enableGyroscope();
+"
+            devices="html5"
+            tooltip="controlBar_classicgyroOnTip"
+            visible="false"
+            />
+    <layer name="controlBar_classicbtn_gyroscope_not"
+            url="%FIRSTXML%/graphics/classiccontrolbar/btn_gyroscope_off.png"
+            style="controlBar_classic_btn_style"
+            enabled="true"
+            capture="false"
+            devices="html5"
+            tooltip="controlBar_classicgyroNotTip"
+            visible="false"
+            />
 
 
     <layer name="controlBar_classicbtn_ctrlmode_move_to"
@@ -636,6 +676,67 @@
 	);
 	</action>
 
+	<events name="controlBar_classicgyroscopeavailableevent"
+		ongyroscopeavailable="controlBar_classicupdateGyroscopeButtonsAvailability();"
+		ongyroscopeunavailable="controlBar_classicupdateGyroscopeButtonsAvailability();"
+		ongyroscopeon="controlBar_classicenableGyroscopeButtons(true);"
+		ongyroscopeoff="controlBar_classicenableGyroscopeButtons(false);"
+		keep="true" devices="html5" />
+	<krpano controlBar_classicmenugyroscopeavailable="false" controlBar_classicmenugyroscopeenabled="false" />
+	<action name="controlBar_classicupdateGyroscopeButtonsAvailability">
+		if (tour_gyroscopedevices,
+			set(controlBar_classicmenugyroscopeavailable, true);
+			controlBar_classicupdateGyroscopeButtons();
+		,
+			set(controlBar_classicmenugyroscopeavailable, false);
+			controlBar_classicupdateGyroscopeButtons();
+		);
+	</action>
+	<action name="controlBar_classicenableGyroscopeButtons">
+		if (tour_gyroscopedevices,
+			set(controlBar_classicmenugyroscopeenabled, %1);
+			controlBar_classicupdateGyroscopeButtons();
+		);
+	</action>
+	<action name="controlBar_classicHideGyroscopeButtons">
+		set(layer[controlBar_classicbtn_gyroscope_off].visible, false);
+		set(layer[controlBar_classicbtn_gyroscope_on].visible, false);
+		if('%1' == 'true' AND plugin[gyroscope],
+			set(layer[controlBar_classicbtn_gyroscope_not].visible, true);
+		,
+			set(layer[controlBar_classicbtn_gyroscope_not].visible, false);
+		);
+	</action>
+	<action name="controlBar_classicShowGyroscopeButtons">
+		if (controlBar_classicmenugyroscopeavailable,
+			if (controlBar_classicmenugyroscopeenabled,
+				set(layer[controlBar_classicbtn_gyroscope_off].visible, true);
+				set(layer[controlBar_classicbtn_gyroscope_on].visible, false);
+			,
+				set(layer[controlBar_classicbtn_gyroscope_off].visible, false);
+				set(layer[controlBar_classicbtn_gyroscope_on].visible, true);
+			);
+			set(layer[controlBar_classicbtn_gyroscope_not].visible, false);
+		,
+			controlBar_classicHideGyroscopeButtons(true);
+		);
+	</action>
+	<action name="controlBar_classicupdateGyroscopeButtons">
+	if (tour_gyroscopedevices,
+		if (controlBar_classicIsOpened,
+			controlBar_classicShowGyroscopeButtons();
+		,
+			controlBar_classicHideGyroscopeButtons();
+		);
+	,
+		if (controlBar_classicIsOpened,
+			controlBar_classicHideGyroscopeButtons(true);
+		,
+			controlBar_classicHideGyroscopeButtons();
+		);
+	);
+	</action>
+
 
 	<events name="controlBar_classiccontrolmodechangedevent" 
 		oncontrolmodechanged="controlBar_classicupdateControlModeButtons();" 
@@ -714,6 +815,7 @@
 
     controlBar_classicupdateControlModeButtons();
 
+    controlBar_classicupdateGyroscopeButtons();
 
     controlBar_classicupdateHelpButtons();
 
@@ -766,6 +868,7 @@
 
     controlBar_classicupdateControlModeButtons();
 
+    controlBar_classicupdateGyroscopeButtons();
 
     controlBar_classicupdateHelpButtons();
 
@@ -953,10 +1056,10 @@
 	keep="true" 
 	type="image" 
 	visible="false"
-	align="left" 
+	align="top" 
 	
-		width="0" 
-		height="90%" 
+		width="90%" 
+		height="0" 
 		
 	
 	x="0"
@@ -1016,7 +1119,7 @@
          parent="thumbnailsBar_thumbnailsBar_theme02"
          thumbWidth="0"
          thumbHeight="0"
-         itemWidth="100"
+         itemWidth="50"
          itemHeight="50"
          offsetX="0" offsetY="0"
          thumbSpacer="0"
@@ -1030,9 +1133,9 @@
     <layer name="thumbsScrollArea_thumbnailsBar_theme02"
            url.flash="%FIRSTXML%/graphics/scrollarea.swf"
            url.html5="%FIRSTXML%/graphics/scrollarea.js"
-           align="left" x="0" y="0"
+           align="top" x="0" y="0"
            onhover_autoscrolling="false"
-           direction="v"/>
+           direction="h"/>
 	
 	</layer>
 	
@@ -1046,8 +1149,8 @@
          targetWidth="0"
          zorder="2"
          onloaded="loadedImages_thumbnailsBar_theme02(arrow1);"
-         url="%FIRSTXML%/graphics/classicthumbnailsbar/btn_scroll_up.png"
-         align="top"
+         url="%FIRSTXML%/graphics/classicthumbnailsbar/btn_scroll_left.png"
+         align="left"
 	/>
 	
 	
@@ -1060,8 +1163,8 @@
          targetWidth="0"
          zorder="2"
          onloaded="loadedImages_thumbnailsBar_theme02(arrow2);"
-         url="%FIRSTXML%/graphics/classicthumbnailsbar/btn_scroll_down.png"
-         align="bottom"
+         url="%FIRSTXML%/graphics/classicthumbnailsbar/btn_scroll_right.png"
+         align="right"
 	/>
 	
 	<action name="loadedImages_thumbnailsBar_theme02">
@@ -1364,12 +1467,12 @@
 		mul(totalMarginX_thumbnailsBar_theme02, get(layer[scrollAreaContainer_thumbnailsBar_theme02].marginX), 2);
 		mul(totalMarginY_thumbnailsBar_theme02, get(layer[scrollAreaContainer_thumbnailsBar_theme02].marginY), 2);
 		
-			add(totalPluginWidth_thumbnailsBar_theme02, get(totalMarginX_thumbnailsBar_theme02), get(layer[scrollAreaContainer_thumbnailsBar_theme02].itemWidth));
+			add(totalPluginHeight_thumbnailsBar_theme02, get(totalMarginY_thumbnailsBar_theme02), get(layer[scrollAreaContainer_thumbnailsBar_theme02].itemHeight));
 			
 			
 			
-			if(layer[get(layer[scrollAreaContainer_thumbnailsBar_theme02].parent)].pixelwidth LT totalPluginWidth_thumbnailsBar_theme02,
-				set(layer[get(layer[scrollAreaContainer_thumbnailsBar_theme02].parent)].width, get(totalPluginWidth_thumbnailsBar_theme02));
+			if(layer[get(layer[scrollAreaContainer_thumbnailsBar_theme02].parent)].pixelheight LT totalPluginHeight_thumbnailsBar_theme02,
+				set(layer[get(layer[scrollAreaContainer_thumbnailsBar_theme02].parent)].height, get(totalPluginHeight_thumbnailsBar_theme02));
 			);
 		
 		layer[get(layer[scrollAreaContainer_thumbnailsBar_theme02].parent)].updatepos();
@@ -1390,15 +1493,15 @@
 		
 		set(layer[get(layer[scrollAreaContainer_thumbnailsBar_theme02].parent)].visible, true);
 		
-		
-			mul(scrollAreaSize_thumbnailsBar_theme02, get(layer[scrollAreaContainer_thumbnailsBar_theme02].itemHeight), get(layer[scrollAreaContainer_thumbnailsBar_theme02].currentThumbsCount));
-			add(scrollAreaSize_thumbnailsBar_theme02, get(totalThumbsSpacer_thumbnailsBar_theme02));
 
-			set(layer[thumbsScrollArea_thumbnailsBar_theme02].width, get(layer[scrollAreaContainer_thumbnailsBar_theme02].itemWidth));
-			set(layer[thumbsScrollArea_thumbnailsBar_theme02].height, get(scrollAreaSize_thumbnailsBar_theme02));
+			mul(scrollAreaSize_thumbnailsBar_theme02, get(layer[scrollAreaContainer_thumbnailsBar_theme02].itemWidth), get(layer[scrollAreaContainer_thumbnailsBar_theme02].currentThumbsCount));
+			add(scrollAreaSize_thumbnailsBar_theme02, get(totalThumbsSpacer_thumbnailsBar_theme02));
+			
+			set(layer[thumbsScrollArea_thumbnailsBar_theme02].width, get(scrollAreaSize_thumbnailsBar_theme02));
+			set(layer[thumbsScrollArea_thumbnailsBar_theme02].height, get(layer[scrollAreaContainer_thumbnailsBar_theme02].itemHeight));
 			
 			
-			if(layer[scrollAreaContainer_thumbnailsBar_theme02].height LT layer[scrollAreaContainer_thumbnailsBar_theme02].itemHeight,
+			if(layer[scrollAreaContainer_thumbnailsBar_theme02].width LT layer[scrollAreaContainer_thumbnailsBar_theme02].itemWidth,
 				set(layer[get(layer[scrollAreaContainer_thumbnailsBar_theme02].parent)].visible, false);
 			,
 				verifyThumbnailsBarVisibility_thumbnailsBar_theme02();
@@ -1430,13 +1533,13 @@
 	
 	<action name="createThumb_thumbnailsBar_theme02">
 
-			add(offsetFactor_thumbnailsBar_theme02, get(layer[scrollAreaContainer_thumbnailsBar_theme02].itemHeight), get(layer[scrollAreaContainer_thumbnailsBar_theme02].thumbSpacer));
+			add(offsetFactor_thumbnailsBar_theme02, get(layer[scrollAreaContainer_thumbnailsBar_theme02].itemWidth), get(layer[scrollAreaContainer_thumbnailsBar_theme02].thumbSpacer));
 	
 			mul(thumbIncPos_thumbnailsBar_theme02, %3, get(offsetFactor_thumbnailsBar_theme02));
 			
 			
 			if(layer[thumbnailBorderSource_thumbnailsBar_theme02].url,
-				add(thumbIncPos_thumbnailsBar_theme02, get(layer[scrollAreaContainer_thumbnailsBar_theme02].offsetY));
+				add(thumbIncPos_thumbnailsBar_theme02, get(layer[scrollAreaContainer_thumbnailsBar_theme02].offsetX));
 			);
 			
 		
@@ -1470,16 +1573,16 @@
 		set(layer[get(thumbName)].align, topleft);
 		
 		
-			set(layer[get(thumbName)].x, get(layer[scrollAreaContainer_thumbnailsBar_theme02].offsetX));
+			set(layer[get(thumbName)].y, get(layer[scrollAreaContainer_thumbnailsBar_theme02].offsetY));
 		
 			if(layer[thumbnailBorderSource_thumbnailsBar_theme02].url,
 				set(layer[get(thumbName)].parent, thumbsScrollArea_thumbnailsBar_theme02);
-				set(layer[get(thumbName)].y, get(thumbIncPos_thumbnailsBar_theme02));
+				set(layer[get(thumbName)].x, get(thumbIncPos_thumbnailsBar_theme02));
 			,
 				set(layer[get(thumbName)].parent, get(thumbBorderName));
-				set(layer[get(thumbName)].y, get(layer[scrollAreaContainer_thumbnailsBar_theme02].offsetY));
+				set(layer[get(thumbName)].x, get(layer[scrollAreaContainer_thumbnailsBar_theme02].offsetX));
 				set(layer[get(thumbName)].onclick, resetMouseBehavior_thumbnailsBar_theme02(); mainloadscene(%1); delayedcall(0.1,highlightThumb_thumbnailsBar_theme02(%1)));
-			);
+			);	
 			
 		
 		
@@ -1497,7 +1600,7 @@
 			set(layer[get(thumbBorderName)].onclick, resetMouseBehavior_thumbnailsBar_theme02(); mainloadscene(%1); delayedcall(0.1,highlightThumb_thumbnailsBar_theme02(%1)));
 		,
 			
-				set(layer[get(thumbBorderName)].y, get(thumbIncPos_thumbnailsBar_theme02)); 
+				set(layer[get(thumbBorderName)].x, get(thumbIncPos_thumbnailsBar_theme02)); 
 				
 		);
 
@@ -1532,7 +1635,7 @@
 		,
 			ifnot(device.touchdevice,
 				
-					if(layer[scrollAreaContainer_thumbnailsBar_theme02].height LT layer[thumbsScrollArea_thumbnailsBar_theme02].height,
+					if(layer[scrollAreaContainer_thumbnailsBar_theme02].width LT layer[thumbsScrollArea_thumbnailsBar_theme02].width,
 				
 					showArrows_thumbnailsBar_theme02();
 				,
@@ -1550,7 +1653,7 @@
 		
 		
 			
-			if(layer[scrollAreaContainer_thumbnailsBar_theme02].height LT layer[scrollAreaContainer_thumbnailsBar_theme02].itemHeight,
+			if(layer[scrollAreaContainer_thumbnailsBar_theme02].width LT layer[scrollAreaContainer_thumbnailsBar_theme02].itemWidth,
 				set(layer[get(layer[scrollAreaContainer_thumbnailsBar_theme02].parent)].visible, false);
 			);
 	</action>
@@ -1567,14 +1670,14 @@
 		
 		
 			
-			add(totalArrowSize_thumbnailsBar_theme02, get(layer[scrollPrevArrow_thumbnailsBar_theme02].height), get(layer[scrollNextArrow_thumbnailsBar_theme02].height));
+			add(totalArrowSize_thumbnailsBar_theme02, get(layer[scrollPrevArrow_thumbnailsBar_theme02].width), get(layer[scrollNextArrow_thumbnailsBar_theme02].width));
 		
 			
-			sub(scrollAreaContainerSize_thumbnailsBar_theme02, get(layer[get(layer[scrollAreaContainer_thumbnailsBar_theme02].parent)].pixelheight), get(totalArrowSize_thumbnailsBar_theme02));
+			sub(scrollAreaContainerSize_thumbnailsBar_theme02, get(layer[get(layer[scrollAreaContainer_thumbnailsBar_theme02].parent)].pixelwidth), get(totalArrowSize_thumbnailsBar_theme02));
 		
-			set(layer[scrollAreaContainer_thumbnailsBar_theme02].height, get(scrollAreaContainerSize_thumbnailsBar_theme02));
-		
-			set(layer[scrollAreaContainer_thumbnailsBar_theme02].y, get(layer[scrollPrevArrow_thumbnailsBar_theme02].height));
+			set(layer[scrollAreaContainer_thumbnailsBar_theme02].width, get(scrollAreaContainerSize_thumbnailsBar_theme02));
+			
+			set(layer[scrollAreaContainer_thumbnailsBar_theme02].x, get(layer[scrollPrevArrow_thumbnailsBar_theme02].width));
 			
 		
 		
@@ -1602,13 +1705,13 @@
 		set(layer[scrollNextArrow_thumbnailsBar_theme02].visible, false);
 		
 		
-		
-			mul(totalMargin_thumbnailsBar_theme02, get(layer[scrollAreaContainer_thumbnailsBar_theme02].marginY), 2);
+
+			mul(totalMargin_thumbnailsBar_theme02, get(layer[scrollAreaContainer_thumbnailsBar_theme02].marginX), 2);
 			
-			sub(scrollAreaContainerSize_thumbnailsBar_theme02, get(layer[get(layer[scrollAreaContainer_thumbnailsBar_theme02].parent)].pixelheight), get(totalMargin_thumbnailsBar_theme02));
-			
-			set(layer[scrollAreaContainer_thumbnailsBar_theme02].height, get(scrollAreaContainerSize_thumbnailsBar_theme02));
-			set(layer[scrollAreaContainer_thumbnailsBar_theme02].y, get(layer[scrollAreaContainer_thumbnailsBar_theme02].marginY));
+			sub(scrollAreaContainerSize_thumbnailsBar_theme02, get(layer[get(layer[scrollAreaContainer_thumbnailsBar_theme02].parent)].pixelwidth), get(totalMargin_thumbnailsBar_theme02));
+
+			set(layer[scrollAreaContainer_thumbnailsBar_theme02].width, get(scrollAreaContainerSize_thumbnailsBar_theme02));
+			set(layer[scrollAreaContainer_thumbnailsBar_theme02].x, get(layer[scrollAreaContainer_thumbnailsBar_theme02].marginX));
 			 
 			
 	</action>
@@ -1627,14 +1730,13 @@
 		
 		
 			
-				sub(scrollLimit_thumbnailsBar_theme02, get(layer[thumbsScrollArea_thumbnailsBar_theme02].height), get(layer[scrollAreaContainer_thumbnailsBar_theme02].height));
+				sub(scrollLimit_thumbnailsBar_theme02, get(layer[thumbsScrollArea_thumbnailsBar_theme02].width), get(layer[scrollAreaContainer_thumbnailsBar_theme02].width));
 				div(scrollLimit_thumbnailsBar_theme02, 2);
 			
-			add(layer[thumbsScrollArea_thumbnailsBar_theme02].y, get(layer[scrollAreaContainer_thumbnailsBar_theme02].scrollSpeed));
-			if(layer[thumbsScrollArea_thumbnailsBar_theme02].y GE scrollLimit_thumbnailsBar_theme02,
-				set(layer[thumbsScrollArea_thumbnailsBar_theme02].y, get(scrollLimit_thumbnailsBar_theme02));
+			add(layer[thumbsScrollArea_thumbnailsBar_theme02].x, get(layer[scrollAreaContainer_thumbnailsBar_theme02].scrollSpeed));
+			if(layer[thumbsScrollArea_thumbnailsBar_theme02].x GE scrollLimit_thumbnailsBar_theme02,
+				set(layer[thumbsScrollArea_thumbnailsBar_theme02].x, get(scrollLimit_thumbnailsBar_theme02));
 			);
-			
 		
 		if(layer[scrollAreaContainer_thumbnailsBar_theme02].scrollSpeed LT layer[scrollAreaContainer_thumbnailsBar_theme02].scrollSpeedMax,
 			inc(layer[scrollAreaContainer_thumbnailsBar_theme02].scrollSpeed);
@@ -1653,14 +1755,14 @@
 		layer[thumbsScrollArea_thumbnailsBar_theme02].stopscrolling();
 		
 			
-			sub(scrollLimit_thumbnailsBar_theme02, get(layer[thumbsScrollArea_thumbnailsBar_theme02].height), get(layer[scrollAreaContainer_thumbnailsBar_theme02].height));
+			sub(scrollLimit_thumbnailsBar_theme02, get(layer[thumbsScrollArea_thumbnailsBar_theme02].width), get(layer[scrollAreaContainer_thumbnailsBar_theme02].width));
 			
 				div(scrollLimit_thumbnailsBar_theme02, 2);
 			mul(scrollLimit_thumbnailsBar_theme02, -1);
 			
-			sub(layer[thumbsScrollArea_thumbnailsBar_theme02].y, get(layer[scrollAreaContainer_thumbnailsBar_theme02].scrollSpeed));
-			if(layer[thumbsScrollArea_thumbnailsBar_theme02].y LE scrollLimit_thumbnailsBar_theme02,
-				set(layer[thumbsScrollArea_thumbnailsBar_theme02].y, get(scrollLimit_thumbnailsBar_theme02));
+			sub(layer[thumbsScrollArea_thumbnailsBar_theme02].x, get(layer[scrollAreaContainer_thumbnailsBar_theme02].scrollSpeed));
+			if(layer[thumbsScrollArea_thumbnailsBar_theme02].x LE scrollLimit_thumbnailsBar_theme02,
+				set(layer[thumbsScrollArea_thumbnailsBar_theme02].x, get(scrollLimit_thumbnailsBar_theme02));
 			);
 		
 		if(layer[scrollAreaContainer_thumbnailsBar_theme02].scrollSpeed LT layer[scrollAreaContainer_thumbnailsBar_theme02].scrollSpeedMax,
@@ -1769,25 +1871,24 @@
 		txtadd(thumbBorderName, %1);
 		txtadd(thumbBorderName, '_thumbnailsBar_theme02');
 
-			set(posY_thumbnailsBar_theme02, 0);
+			set(posX_thumbnailsBar_theme02, 0);
 			if(layer[thumbnailBorderSource_thumbnailsBar_theme02].url,
-				div(halfThumbHeight_thumbnailsBar_theme02, get(layer[get(thumbName)].height), 2);
+				div(halfThumbWidth_thumbnailsBar_theme02, get(layer[get(thumbName)].width), 2);
 				ifnot(layer[scrollAreaContainer_thumbnailsBar_theme02].adjustToContent,
-					add(posY_thumbnailsBar_theme02, get(layer[get(thumbName)].y), get(halfThumbHeight_thumbnailsBar_theme02));
+					add(posX_thumbnailsBar_theme02, get(layer[get(thumbName)].x), get(halfThumbWidth_thumbnailsBar_theme02));
 				);
 				if(layer[thumbsScrollArea_thumbnailsBar_theme02].scrolltocenter,
-					layer[thumbsScrollArea_thumbnailsBar_theme02].scrolltocenter(0, get(posY_thumbnailsBar_theme02));
+					layer[thumbsScrollArea_thumbnailsBar_theme02].scrolltocenter(get(posX_thumbnailsBar_theme02), 0);
 				);
 			,
-				div(halfThumbHeight_thumbnailsBar_theme02, get(layer[get(thumbBorderName)].height), 2);
+				div(halfThumbWidth_thumbnailsBar_theme02, get(layer[get(thumbBorderName)].width), 2);
 				ifnot(layer[scrollAreaContainer_thumbnailsBar_theme02].adjustToContent,
-					add(posY_thumbnailsBar_theme02, get(layer[get(thumbBorderName)].y), get(halfThumbHeight_thumbnailsBar_theme02));
+					add(posX_thumbnailsBar_theme02, get(layer[get(thumbBorderName)].x), get(halfThumbWidth_thumbnailsBar_theme02));
 				);
 				if(layer[thumbsScrollArea_thumbnailsBar_theme02].scrolltocenter,
-					layer[thumbsScrollArea_thumbnailsBar_theme02].scrolltocenter(0, get(posY_thumbnailsBar_theme02));
+					layer[thumbsScrollArea_thumbnailsBar_theme02].scrolltocenter(get(posX_thumbnailsBar_theme02), 0);
 				);
 			);
-		
 		
 	</action>
 	
@@ -1972,6 +2073,14 @@ getmessage(urltoopen,logowebsiteurl);openurl(get(urltoopen),_blank);
   <!-- Hide / Show Controls -->
   <action name="hideTourControls">set(tour_displaycontrols, false);events.dispatch(hidetourcontrols);</action>
   <action name="showTourControls">set(tour_displaycontrols, true); events.dispatch(showtourcontrols);</action>
+
+
+  <action name="enableGyroscope">
+    changeGyroscopeState(true);
+  </action>
+  <action name="disableGyroscope">
+    changeGyroscopeState(false);
+  </action>
 
 
 <action name="setViewNormal">
@@ -2281,7 +2390,6 @@ getmessage(urltoopen,logowebsiteurl);openurl(get(urltoopen),_blank);
     );
   </action>
   <action name="preloadSounds">
-    preloadsound("cheerful-piano-for-bright-days-145697.mp3");
   </action>
 
   <action name="play3DLocalSounds">
